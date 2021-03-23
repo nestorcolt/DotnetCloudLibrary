@@ -10,7 +10,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace CloudLibrary.Controllers
 {
@@ -18,13 +17,11 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
-        private readonly IConfiguration _config;
 
-        public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler, IConfiguration config)
+        public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
         {
             _log = log;
             _apiHandler = apiHandler;
-            _config = config;
         }
 
         //public readonly SignatureObject _signature = new SignatureObject();
@@ -73,9 +70,9 @@ namespace CloudLibrary.Controllers
         public Dictionary<string, string> EmulateDevice(Dictionary<string, string> requestDictionary)
         {
             string instanceId = Guid.NewGuid().ToString().Replace("-", "");
-            string androidVersion = _config.GetValue<string>("OSVersion");
-            string deviceModel = _config.GetValue<string>("DeviceModel");
-            string build = _config.GetValue<string>("BuildVersion");
+            string androidVersion = Constants.OSVersion;
+            string deviceModel = Constants.DeviceModel;
+            string build = Constants.BuildVersion;
 
             var offerAcceptHeaders = new Dictionary<string, string>
             {

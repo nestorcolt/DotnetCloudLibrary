@@ -5,6 +5,10 @@
         public static readonly string AwsAccountId = "436783151981";
         public static string AppVersion => "3.51.3.3.0";
 
+        public static string OSVersion => "7.1.2";
+        public static string DeviceModel => "SM-G977N";
+        public static string BuildVersion => "N2G48C";
+
         public static readonly string AuthenticationSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-AUTHENTICATE-TOPIC";
         public static readonly string AcceptedSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-ACCEPTED-TOPIC";
         public static readonly string OffersSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-OFFERS-TOPIC";
