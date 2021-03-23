@@ -1,7 +1,6 @@
 ﻿using CloudLibrary.lib;
 using CloudLibrary.Lib;
 using CloudLibrary.Models;
-using CloudLibrary.Properties;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace CloudLibrary.Controllers
 {
@@ -18,11 +18,13 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
+        private readonly IConfiguration _config;
 
-        public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
+        public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler, IConfiguration config)
         {
             _log = log;
             _apiHandler = apiHandler;
+            _config = config;
         }
 
         //public readonly SignatureObject _signature = new SignatureObject();
@@ -71,9 +73,9 @@ namespace CloudLibrary.Controllers
         public Dictionary<string, string> EmulateDevice(Dictionary<string, string> requestDictionary)
         {
             string instanceId = Guid.NewGuid().ToString().Replace("-", "");
-            string androidVersion = settings.Default.OSVersion;
-            string deviceModel = settings.Default.DeviceModel;
-            string build = settings.Default.BuildVersion;
+            string androidVersion = _config.GetValue<string>("OSVersion");
+            string deviceModel = _config.GetValue<string>("DeviceModel");
+            string build = _config.GetValue<string>("BuildVersion");
 
             var offerAcceptHeaders = new Dictionary<string, string>
             {

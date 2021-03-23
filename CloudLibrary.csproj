@@ -24,24 +24,9 @@
 	  <PackageReference Include="Amazon.Lambda.Core" Version="1.2.0" />
 	  <PackageReference Include="AWSSDK.SQS" Version="3.5.1.27" />
 
-	  <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-	  <PackageReference Include="System.Security.AccessControl" Version="5.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-	<Compile Update="Properties\settings.Designer.cs">
-	  <DesignTimeSharedInput>True</DesignTimeSharedInput>
-	  <DependentUpon>settings.settings</DependentUpon>
-	  <AutoGen>True</AutoGen>
-	</Compile>
-  </ItemGroup>
-  <ItemGroup>
-	<None Update="Properties\settings.settings">
-	  <LastGenOutput>settings.Designer.cs</LastGenOutput>
-	  <Generator>PublicSettingsSingleFileGenerator</Generator>
-	</None>
   </ItemGroup>
 </Project>
