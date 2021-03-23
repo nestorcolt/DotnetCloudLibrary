@@ -27,7 +27,7 @@ namespace CloudLibrary.Test
                         c.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     });
 
-                    services.AddTransient<ILambdaConfiguration, LambdaConfiguration>();
+                    services.AddTransient<ILibConfiguration, LibConfiguration>();
                     services.AddTransient<IAuthenticator, Authenticator>();
                     services.AddTransient<IBlockCatcher, BlockCatcher>();
 

@@ -2,7 +2,7 @@
 
 namespace CloudLibrary.Models
 {
-    public interface ILambdaConfiguration
+    public interface ILibConfiguration
     {
         IConfigurationRoot Configuration { get; }
     }
