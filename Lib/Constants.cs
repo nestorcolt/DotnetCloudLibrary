@@ -3,6 +3,7 @@
     public static class Constants
     {
         public static readonly string AwsAccountId = "436783151981";
+        public static string AppVersion => "3.51.3.3.0";
 
         public static readonly string AuthenticationSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-AUTHENTICATE-TOPIC";
         public static readonly string AcceptedSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-ACCEPTED-TOPIC";
@@ -21,8 +22,6 @@
         public static string AcceptUri = "AcceptOffer";
         public static string OffersUri = "GetOffersForProviderPost";
         public static string ServiceAreaUri = "eligibleServiceAreas";
-
-        public static string AppVersion => "3.51.3.3.0";
 
         public const string UserPk = "user_id";
         public static string UserLogStreamName = "User-{0}";
