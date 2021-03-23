@@ -5,7 +5,7 @@
 	<AWSProjectType>Lambda</AWSProjectType>
 	<!-- This property makes the build directory similar to a publish directory and helps the AWS .NET Lambda Mock Test Tool find project dependencies. -->
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-	<OutputType>Exe</OutputType>
+	<OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
 	<None Remove="appsettings.json" />
