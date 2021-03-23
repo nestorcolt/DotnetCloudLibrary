@@ -2,11 +2,9 @@
 {
     public static class Constants
     {
-        public static readonly string AwsAccountId = "320132171574";
+        public static readonly string AwsAccountId = "436783151981";
 
-        public static readonly string AuthenticationSnsTopic =
-            $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-AUTHENTICATE-TOPIC";
-
+        public static readonly string AuthenticationSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-AUTHENTICATE-TOPIC";
         public static readonly string AcceptedSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-ACCEPTED-TOPIC";
         public static readonly string OffersSnsTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-OFFERS-TOPIC";
         public static readonly string LogToCloudTopic = $"arn:aws:sns:us-east-1:{AwsAccountId}:SE-LOGS-TOPIC";
