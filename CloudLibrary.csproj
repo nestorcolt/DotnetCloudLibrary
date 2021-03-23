@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
 	<TargetFramework>netcoreapp3.1</TargetFramework>
 	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -6,6 +6,14 @@
 	<!-- This property makes the build directory similar to a publish directory and helps the AWS .NET Lambda Mock Test Tool find project dependencies. -->
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+  <ItemGroup>
+	<None Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+	<Content Include="appsettings.json">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+  </ItemGroup>
   <ItemGroup>
 	  <PackageReference Include="Amazon.Lambda.Core" Version="1.2.0" />
 	  <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.1.0" />
@@ -24,16 +32,16 @@
 	  <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Properties\settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>settings.settings</DependentUpon>
-      <AutoGen>True</AutoGen>
-    </Compile>
+	<Compile Update="Properties\settings.Designer.cs">
+	  <DesignTimeSharedInput>True</DesignTimeSharedInput>
+	  <DependentUpon>settings.settings</DependentUpon>
+	  <AutoGen>True</AutoGen>
+	</Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Properties\settings.settings">
-      <LastGenOutput>settings.Designer.cs</LastGenOutput>
-      <Generator>PublicSettingsSingleFileGenerator</Generator>
-    </None>
+	<None Update="Properties\settings.settings">
+	  <LastGenOutput>settings.Designer.cs</LastGenOutput>
+	  <Generator>PublicSettingsSingleFileGenerator</Generator>
+	</None>
   </ItemGroup>
 </Project>

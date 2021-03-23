@@ -41,7 +41,7 @@ namespace CloudLibrary.Test
             string userData = DynamoHandler.QueryUser(_userId).Result;
             UserDto userDto = JsonConvert.DeserializeObject<UserDto>(userData);
             userDto.TimeZone = "Eastern Standard Time";
-            userDto.MinimumPrice = 0;
+            userDto.MinimumPrice = 10000;
 
             while (true)
             {
