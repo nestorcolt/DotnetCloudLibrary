@@ -1,8 +1,8 @@
 {
   "profiles": {
-	  "Debug": {
-	  "commandName": "Executable",
-	  "executablePath": "C:\\Users\\Sudo\\Desktop\\Development\\BlockInService\\Tech\\SearchEngines\\CloudLibrary\\bin\\Debug\\netcoreapp3.1\\CloudLibrary.exe"
-	}
+    "Debug": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\Sudo\\Desktop\\Development\\BlockInService\\Tech\\SearchEngines\\CloudLibrary\\bin\\Debug\\netcoreapp3.1\\CloudLibrary.exe"
+    }
   }
 }
