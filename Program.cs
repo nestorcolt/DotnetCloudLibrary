@@ -1,6 +1,6 @@
 ﻿using CloudLibrary.Test;
 
-namespace SearchEngine
+namespace CloudLibrary
 {
     class Program
     {
