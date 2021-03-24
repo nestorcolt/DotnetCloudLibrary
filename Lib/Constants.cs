@@ -1,8 +1,10 @@
-﻿namespace CloudLibrary.lib
+﻿using CloudLibrary.Lib;
+
+namespace CloudLibrary.lib
 {
     public static class Constants
     {
-        public static string AwsAccountId = "";
+        public static string AwsAccountId = StsHandler.GetAccountId();
         public static string AppVersion => "3.51.3.3.0";
 
         public static string OSVersion => "7.1.2";
