@@ -2,7 +2,7 @@
 {
     public static class Constants
     {
-        public static readonly string AwsAccountId = "436783151981";
+        public static string AwsAccountId = "";
         public static string AppVersion => "3.51.3.3.0";
 
         public static string OSVersion => "7.1.2";
