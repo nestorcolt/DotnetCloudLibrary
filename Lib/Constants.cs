@@ -1,12 +1,12 @@
-﻿using CloudLibrary.Lib;
-
-namespace CloudLibrary.lib
+﻿namespace CloudLibrary.lib
 {
     public static class Constants
     {
-        public static string AwsAccountId = StsHandler.GetAccountId();
-        public static string AppVersion => "3.51.3.3.0";
+        // change this once I need to swap accounts. Can't get it dynamically because impacts performance ...
+        public static readonly string AwsAccountId = "436783151981";
 
+        // Settings for emulating the phone
+        public static string AppVersion => "3.51.3.3.0";
         public static string OSVersion => "7.1.2";
         public static string DeviceModel => "SM-G977N";
         public static string BuildVersion => "N2G48C";
