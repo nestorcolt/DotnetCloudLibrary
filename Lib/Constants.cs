@@ -3,7 +3,7 @@
     public static class Constants
     {
         // change this once I need to swap accounts. Can't get it dynamically because impacts performance ...
-        public static string AwsAccountId = "436783151981";
+        public static readonly string AwsAccountId = "436783151981";
 
         // Settings for emulating the phone
         public static string AppVersion => "3.51.3.3.0";
