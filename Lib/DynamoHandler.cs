@@ -4,6 +4,10 @@ using Amazon.DynamoDBv2.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CloudLibrary.lib;
+using CloudLibrary.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CloudLibrary.Lib
 {
@@ -15,6 +19,7 @@ namespace CloudLibrary.Lib
         private static string _accessToken = "access_token";
         private static string _serviceArea = "service_area";
         private static string _blockTable = "Blocks";
+        private static string _OffersTable = "Offers";
         private static string _tableName = "Users";
         private static string _tablePk = "user_id";
         private static string _blockId = "block_id";
@@ -54,6 +59,32 @@ namespace CloudLibrary.Lib
             };
 
             await usersTable.UpdateItemAsync(order, userId);
+        }
+
+        public static async Task PutNewOffer(string userId, bool validated, JObject data)
+        {
+            Table offersTable = Table.LoadTable(Client, _OffersTable);
+
+            long currentTime = Utils.GetUnixTimestamp();
+            long hoursToMinutes = Constants.CleanUpOffersTimeThreshold * 60;
+            long expirationDate = Utils.GetFutureTimeStamp(hoursToMinutes);
+
+            // Create offer from model
+            OfferModel offerModel = new OfferModel
+            {
+                UserId = userId,
+                OfferId = data["offerId"].ToString(),
+                Validated = validated,
+                OfferAreaId = data["serviceAreaId"].ToString(),
+                OfferTime = currentTime,
+                OfferTimeToLive = expirationDate,
+                OfferData = data
+            };
+
+            string jsonText = JsonConvert.SerializeObject(offerModel, Formatting.Indented);
+            Document offerDocument = Document.FromJson(jsonText);
+
+            await offersTable.UpdateItemAsync(offerDocument, userId, offerModel.OfferId);
         }
 
         public static async Task DeleteBlocksTable()

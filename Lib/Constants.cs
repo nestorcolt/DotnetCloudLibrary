@@ -32,5 +32,8 @@
         public const string UserPk = "user_id";
         public static string UserLogStreamName = "User-{0}";
         public const string TokenKeyConstant = "x-amz-access-token";
+
+        // Offers Table 
+        public const int CleanUpOffersTimeThreshold = 48;
     }
 }
