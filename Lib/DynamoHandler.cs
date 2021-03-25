@@ -1,13 +1,13 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using CloudLibrary.lib;
 using CloudLibrary.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CloudLibrary.Lib
 {
@@ -85,6 +85,41 @@ namespace CloudLibrary.Lib
             Document offerDocument = Document.FromJson(jsonText);
 
             await offersTable.UpdateItemAsync(offerDocument, userId, offerModel.OfferId);
+        }
+
+        public static async Task PutNewBlock(string userId, JObject data)
+        {
+            Table blocksTable = Table.LoadTable(Client, _blockTable);
+
+            long currentTime = Utils.GetUnixTimestamp();
+            long hoursToMinutes = Constants.CleanUpOffersTimeThreshold * 60;
+            long expirationDate = Utils.GetFutureTimeStamp(hoursToMinutes);
+
+            string startTime = data["startTime"].ToString();
+
+            // Create block from model
+            BlockModel blockModel = new BlockModel()
+            {
+                UserId = userId,
+                BlockId = GetNewBlockId(currentTime, startTime),
+                BlockAreaId = data["serviceAreaId"].ToString(),
+                BlockTime = currentTime,
+                BlockTimeToLive = expirationDate,
+                BlockData = data
+            };
+
+            string jsonText = JsonConvert.SerializeObject(blockModel, Formatting.Indented);
+            Document blockDocument = Document.FromJson(jsonText);
+
+            await blocksTable.UpdateItemAsync(blockDocument, userId, blockModel.BlockId);
+        }
+
+        private static long GetNewBlockId(long capturedTime, string blockTime)
+        {
+            Random rnd = new Random();
+            int randInt = rnd.Next(0, Int32.Parse(blockTime));
+            long result = capturedTime + randInt + Int32.Parse(blockTime);
+            return result;
         }
 
         public static async Task DeleteBlocksTable()
