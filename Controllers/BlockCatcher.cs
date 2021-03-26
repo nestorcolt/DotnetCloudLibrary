@@ -145,7 +145,7 @@ namespace CloudLibrary.Controllers
             );
 
             // LOGS FOR SEEN OFFERS
-            await SnsHandler.PublishToSnsAsync(offerSeen.ToString(), "msg", Constants.OffersSnsTopic);
+            await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
         }
 
         public void AcceptOffers(JToken offerList, UserDto userDto, Dictionary<string, string> requestHeaders)

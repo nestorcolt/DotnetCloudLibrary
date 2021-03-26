@@ -9,9 +9,9 @@ namespace CloudLibrary.Lib
     {
         public static IAmazonSQS Client = new AmazonSQSClient();
 
-        public static async Task<string> GetQueueByName(IAmazonSQS sqsClient, string name)
+        public static async Task<string> GetQueueByName(string name)
         {
-            ListQueuesResponse responseList = await sqsClient.ListQueuesAsync(name);
+            ListQueuesResponse responseList = await Client.ListQueuesAsync(name);
 
             if (responseList.QueueUrls.Count > 0)
             {
@@ -21,16 +21,16 @@ namespace CloudLibrary.Lib
             return null;
         }
 
-        public static async Task SendMessage(IAmazonSQS sqsClient, string qUrl, string messageBody)
+        public static async Task SendMessage(string qUrl, string messageBody)
         {
-            SendMessageResponse responseSendMsg = await sqsClient.SendMessageAsync(qUrl, messageBody);
+            SendMessageResponse responseSendMsg = await Client.SendMessageAsync(qUrl, messageBody);
         }
 
-        public static async Task DeleteMessage(IAmazonSQS sqsClient, string receiptHandle, string qUrl)
+        public static async Task DeleteMessage(string receiptHandle, string qUrl)
         {
             try
             {
-                await sqsClient.DeleteMessageAsync(qUrl, receiptHandle);
+                await Client.DeleteMessageAsync(qUrl, receiptHandle);
             }
             catch (Exception)
             {
