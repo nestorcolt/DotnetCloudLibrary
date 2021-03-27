@@ -129,6 +129,7 @@ namespace CloudLibrary.Controllers
 
                     // LOGS FOR ACCEPTED OFFERS
                     await SnsHandler.PublishToSnsAsync(data.ToString(), "msg", Constants.AcceptedSnsTopic);
+                    await SqsHandler.SendMessage(Constants.UpdateBlocksTableQueue, data.ToString());
                 }
 
                 // test to log in cloud watch (Removed later)
