@@ -133,7 +133,7 @@ namespace CloudLibrary.Controllers
 
                 // test to log in cloud watch (Removed later)
                 var msg = $"\nUser: {userDto.UserId} >> Accept Block Operation Status >> Code >> {response.StatusCode}\n";
-                _log.LogInformation(msg);
+                Console.WriteLine(msg);
             }
 
             // send the offer seen to the offers table for further data processing or analytic
