@@ -128,12 +128,11 @@ namespace CloudLibrary.Controllers
                         );
 
                     // LOGS FOR ACCEPTED OFFERS
-                    await SnsHandler.PublishToSnsAsync(data.ToString(), "msg", Constants.AcceptedSnsTopic);
+                    await SqsHandler.SendMessage(Constants.UpdateBlocksTableQueue, data.ToString());
                 }
 
-                // test to log in cloud watch
-                var msg = $"\nAccept Block Operation Status >> Code >> {response.StatusCode}\n";
-                await CloudLogger.Log(msg, userDto.UserId);
+                // test to log in cloud watch (Removed later)
+                var msg = $"\nUser: {userDto.UserId} >> Accept Block Operation Status >> Code >> {response.StatusCode}\n";
                 _log.LogInformation(msg);
             }
 
