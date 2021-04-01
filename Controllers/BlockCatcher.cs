@@ -95,6 +95,7 @@ namespace CloudLibrary.Controllers
         public async Task AcceptSingleOfferAsync(JToken block, UserDto userDto, Dictionary<string, string> requestHeaders)
         {
             bool isValidated = false;
+            string status = block["status"].ToString();
             long offerTime = (long)block["startTime"];
             string serviceAreaId = (string)block["serviceAreaId"];
             float offerPrice = (float)block["rateInfo"]["priceAmount"];
@@ -106,7 +107,11 @@ namespace CloudLibrary.Controllers
             Parallel.Invoke(() => scheduleValidation = ScheduleValidator.ValidateSchedule(userDto.SearchSchedule, offerTime, userDto.TimeZone),
                 () => areaValidation = ValidateArea(serviceAreaId, userDto.Areas));
 
-            if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation)
+            // RESERVED blocks validation
+            var reservedBlocksValidationList = new List<bool>() { areaValidation, status == "RESERVED" };
+            bool reservedBlocksValidation = reservedBlocksValidationList.All(element => element);
+
+            if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation || reservedBlocksValidation)
             {
                 // to track in offers table
                 isValidated = true;

@@ -22,6 +22,9 @@ namespace CloudLibrary.Lib
         [DataMember(Name = "minimum_price")]
         public float MinimumPrice { get; set; }
 
+        [DataMember(Name = "arrival_time")]
+        public int ArrivalTime { get; set; }
+
         [DataMember(Name = "speed")]
         public float Speed { get; set; }
 
