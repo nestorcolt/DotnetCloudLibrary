@@ -132,13 +132,16 @@ namespace CloudLibrary.Lib
                 Search search = table.Scan(scanFilter);
                 List<Document> documentSet = search.GetNextSetAsync().Result;
 
-                // This counter is the total of items found in the table. Will break the loop
-                var tableTotalItemCount = documentSet.Count;
+                // If the counter is 0 will break the loop. This because the batch can only process a fixed amount of
+                // items or size per call because dynamoDB technology.
+                if (documentSet.Count == 0)
+                    break;
 
                 // Start to handle the WriteRequest (the method to batch process many elements at once)
                 var writeRequestList = new List<WriteRequest>();
+                int iterationCount = documentSet.Count > 24 ? 24 : documentSet.Count;
 
-                Parallel.ForEach(documentSet, item =>
+                Parallel.For(0, iterationCount, index =>
                 {
                     writeRequestList.Add(new WriteRequest
                     {
@@ -146,8 +149,8 @@ namespace CloudLibrary.Lib
                         {
                             Key = new Dictionary<string, AttributeValue>()
                             {
-                                {_tablePk, new AttributeValue {S = item.ToAttributeMap()[_tablePk].S}},
-                                {_blockId, new AttributeValue {N = item.ToAttributeMap()[_blockId].N}}
+                                {_tablePk, new AttributeValue {S = documentSet[index].ToAttributeMap()[_tablePk].S}},
+                                {_blockId, new AttributeValue {N = documentSet[index].ToAttributeMap()[_blockId].N}}
                             }
                         }
                     });
@@ -167,11 +170,6 @@ namespace CloudLibrary.Lib
                     Console.WriteLine(e);
                     break;
                 }
-
-                // If the counter is 0 will break the loop. This because the batch can only process a fixed amount of
-                // items or size per call because dynamoDB technology.
-                if (tableTotalItemCount == 0)
-                    break;
             }
         }
     }
