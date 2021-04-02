@@ -162,9 +162,10 @@ namespace CloudLibrary.Lib
                     // Try and catch in case the table is empty
                     await Client.BatchWriteItemAsync(request);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Console.WriteLine("No More Items To Delete");
+                    Console.WriteLine(e);
+                    break;
                 }
 
                 // If the counter is 0 will break the loop. This because the batch can only process a fixed amount of
