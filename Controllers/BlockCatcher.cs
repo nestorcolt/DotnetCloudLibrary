@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -17,6 +18,7 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
+        private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
         {
@@ -142,6 +144,10 @@ namespace CloudLibrary.Controllers
                 Console.WriteLine(msg);
             }
 
+            // the code that you want to measure comes here
+            //SpeedCounter.Stop();
+            //Console.WriteLine(SpeedCounter.ElapsedMilliseconds);
+
             // send the offer seen to the offers table for further data processing or analytic
             JObject offerSeen = new JObject(
                 new JProperty(Constants.UserPk, userDto.UserId),
@@ -168,6 +174,7 @@ namespace CloudLibrary.Controllers
             // Todo: in case we need this, I will come back to this part to parse the signature to the headers.
             //SignRequestHeaders($"{ApiHandler.ApiBaseUrl}{ApiHandler.OffersUri}");
             var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
+            //SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
             {
