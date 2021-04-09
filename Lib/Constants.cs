@@ -6,7 +6,7 @@
         public static readonly string AwsAccountId = "320132171574";
 
         // Settings for emulating the phone
-        public static string AppVersion => "3.51.3.3.0";
+        public static string AppVersion => "3.52.2.35.0";
         public static string OSVersion => "7.1.2";
         public static string DeviceModel => "SM-G977N";
         public static string BuildVersion => "N2G48C";
