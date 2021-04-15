@@ -18,7 +18,7 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
-        private Stopwatch SpeedCounter;
+        //private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
         {
@@ -183,7 +183,6 @@ namespace CloudLibrary.Controllers
 
         public async Task<bool> LookingForBlocks(UserDto userDto)
         {
-
             // validator of weekly schedule
             if (!ScheduleHasData(userDto.SearchSchedule))
             {
