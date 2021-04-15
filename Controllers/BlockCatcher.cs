@@ -115,13 +115,9 @@ namespace CloudLibrary.Controllers
 
             if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation || reservedBlocksValidation)
             {
-                // to track in offers table
-                isValidated = true;
-                string offerId = block["offerId"].ToString();
-
                 JObject acceptHeader = new JObject(
                     new JProperty("__type", $"AcceptOfferInput:{Constants.AcceptInputUrl}"),
-                    new JProperty("offerId", offerId)
+                    new JProperty("offerId", block["offerId"].ToString())
                 );
 
                 HttpResponseMessage response = await _apiHandler.PostDataAsync(Constants.AcceptUri, acceptHeader.ToString(), requestHeaders);
@@ -138,6 +134,9 @@ namespace CloudLibrary.Controllers
                     await SnsHandler.PublishToSnsAsync(data.ToString(), "msg", Constants.AcceptedSnsTopic);
                     await SqsHandler.SendMessage(Constants.UpdateBlocksTableQueue, data.ToString());
                 }
+
+                // to track in offers table as validated offer (passed the filters)
+                isValidated = true;
 
                 // test to log in cloud watch (Removed later)
                 var msg = $"\nUser: {userDto.UserId} >> Accept Block Operation Status >> Code >> {response.StatusCode}\n";
@@ -163,8 +162,7 @@ namespace CloudLibrary.Controllers
         {
             Parallel.For(0, offerList.Count(), n =>
             {
-                JToken innerBlock = offerList[n];
-                Thread accept = new Thread(async task => await AcceptSingleOfferAsync(innerBlock, userDto, requestHeaders));
+                Thread accept = new Thread(async task => await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders));
                 accept.Start();
             });
         }
@@ -181,14 +179,14 @@ namespace CloudLibrary.Controllers
                 JObject requestToken = await _apiHandler.GetRequestJTokenAsync(response);
                 JToken offerList = requestToken.GetValue("offerList");
 
-                // If log debug
-                _log.LogDebug(offerList.ToString());
-
-                if (offerList != null && offerList.HasValues)
+                if (offerList.HasValues)
                 {
                     Thread acceptThread = new Thread(task => AcceptOffers(offerList, userDto, requestHeaders));
                     acceptThread.Start();
                 }
+
+                // If log debug
+                _log.LogDebug(offerList.ToString());
             }
 
             return response.StatusCode;
