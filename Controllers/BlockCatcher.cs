@@ -41,17 +41,6 @@ namespace CloudLibrary.Controllers
             return false;
         }
 
-        public bool ValidateArea(string serviceAreaId, List<string> areas)
-        {
-            if (areas.Count == 0)
-                return true;
-
-            if (areas.Contains(serviceAreaId))
-                return true;
-
-            return false;
-        }
-
         //public void SignRequestHeaders(string url)
         //{
         //    SortedDictionary<string, string> signatureHeaders = _signature.CreateSignature(url, AccessToken);
@@ -107,7 +96,7 @@ namespace CloudLibrary.Controllers
             bool areaValidation = false;
 
             Parallel.Invoke(() => scheduleValidation = ScheduleValidator.ValidateSchedule(userDto.SearchSchedule, offerTime, userDto.TimeZone),
-                () => areaValidation = ValidateArea(serviceAreaId, userDto.Areas));
+                () => areaValidation = userDto.Areas.Contains(serviceAreaId));
 
             // RESERVED blocks validation
             var reservedBlocksValidationList = new List<bool>() { areaValidation, status == "RESERVED" };
