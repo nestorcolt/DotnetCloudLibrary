@@ -7,11 +7,11 @@ using System.Text;
 
 namespace CloudLibrary.Lib
 {
-    public class SignatureObject
+    public static class SignatureObject
     {
         private const string SignaturePrefix = "RABBIT3-HMAC-SHA256";
 
-        public SortedDictionary<string, string> CreateSignature(string url, string token)
+        public static SortedDictionary<string, string> CreateSignature(string url, string token)
         {
             // 0. Prepare request message.
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);

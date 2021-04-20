@@ -4,6 +4,7 @@ using CloudLibrary.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -41,15 +42,17 @@ namespace CloudLibrary.Controllers
             return false;
         }
 
-        //public void SignRequestHeaders(string url)
-        //{
-        //    SortedDictionary<string, string> signatureHeaders = _signature.CreateSignature(url, AccessToken);
+        public Dictionary<string, string> SignRequestHeaders(string url, string accessToken, Dictionary<string, string> requestHeaders)
+        {
+            SortedDictionary<string, string> signatureHeaders = SignatureObject.CreateSignature(url, accessToken);
 
-        //    RequestDataHeadersDictionary["X-Amz-Date"] = signatureHeaders["X-Amz-Date"];
-        //    RequestDataHeadersDictionary["X-Flex-Client-Time"] = GetTimestamp().ToString();
-        //    RequestDataHeadersDictionary["X-Amzn-RequestId"] = signatureHeaders["X-Amzn-RequestId"];
-        //    RequestDataHeadersDictionary["Authorization"] = signatureHeaders["Authorization"];
-        //}
+            requestHeaders["X-Amz-Date"] = signatureHeaders["X-Amz-Date"];
+            requestHeaders["X-Flex-Client-Time"] = GetTimestamp().ToString();
+            requestHeaders["X-Amzn-RequestId"] = signatureHeaders["X-Amzn-RequestId"];
+            requestHeaders["Authorization"] = signatureHeaders["Authorization"];
+
+            return requestHeaders;
+        }
 
         public int GetTimestamp()
         {
@@ -159,8 +162,8 @@ namespace CloudLibrary.Controllers
         public async Task<HttpStatusCode> GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
         {
             // Todo: in case we need this, I will come back to this part to parse the signature to the headers.
-            //SignRequestHeaders($"{ApiHandler.ApiBaseUrl}{ApiHandler.OffersUri}");
-            var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
+            var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
+            var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, signedHeaders);
             //SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
@@ -170,7 +173,7 @@ namespace CloudLibrary.Controllers
 
                 if (offerList.HasValues)
                 {
-                    Thread acceptThread = new Thread(task => AcceptOffers(offerList, userDto, requestHeaders));
+                    Thread acceptThread = new Thread(task => AcceptOffers(offerList, userDto, signedHeaders));
                     acceptThread.Start();
                 }
 
