@@ -4,9 +4,7 @@ using CloudLibrary.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -161,7 +159,6 @@ namespace CloudLibrary.Controllers
 
         public async Task<HttpStatusCode> GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
         {
-            // Todo: in case we need this, I will come back to this part to parse the signature to the headers.
             var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
             var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, signedHeaders);
             //SpeedCounter = Stopwatch.StartNew();
