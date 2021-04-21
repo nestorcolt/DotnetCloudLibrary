@@ -25,8 +25,6 @@ namespace CloudLibrary.Controllers
             _apiHandler = apiHandler;
         }
 
-        //public readonly SignatureObject _signature = new SignatureObject();
-
         public async Task DeactivateUser(string userId)
         {
             await SnsHandler.PublishToSnsAsync(new JObject(new JProperty(Constants.UserPk, userId)).ToString(), "msg", Constants.StopSnsTopic);
