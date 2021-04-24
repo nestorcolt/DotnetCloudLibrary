@@ -100,8 +100,9 @@ namespace CloudLibrary.Controllers
             // RESERVED blocks validation
             var reservedBlocksValidationList = new List<bool>() { areaValidation, status == "RESERVED" };
             bool reservedBlocksValidation = reservedBlocksValidationList.All(element => element);
+            bool arrivalTimeCheck = Math.Abs(offerTime - GetTimestamp()) > userDto.ArrivalTime;
 
-            if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation || reservedBlocksValidation)
+            if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation && arrivalTimeCheck || reservedBlocksValidation)
             {
                 JObject acceptHeader = new JObject(
                     new JProperty("__type", $"AcceptOfferInput:{Constants.AcceptInputUrl}"),
