@@ -160,6 +160,8 @@ namespace CloudLibrary.Controllers
         {
             //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
             var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
+            var msg = $"\nUser: {userDto.UserId} >> Blocks: {response.StatusCode} >> Content: {response.Content}\n";
+            Console.WriteLine(msg);
             //SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
