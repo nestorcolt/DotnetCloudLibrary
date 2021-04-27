@@ -85,7 +85,7 @@ namespace CloudLibrary.Controllers
         public async Task AcceptSingleOfferAsync(JToken block, UserDto userDto, Dictionary<string, string> requestHeaders)
         {
             bool isValidated = false;
-            string status = block["status"].ToString();
+            //string status = block["status"].ToString();
             long offerTime = (long)block["startTime"];
             string serviceAreaId = (string)block["serviceAreaId"];
             float offerPrice = (float)block["rateInfo"]["priceAmount"];
@@ -98,11 +98,11 @@ namespace CloudLibrary.Controllers
                 () => areaValidation = userDto.Areas.Contains(serviceAreaId));
 
             // RESERVED blocks validation
-            var reservedBlocksValidationList = new List<bool>() { areaValidation, status == "RESERVED" };
-            bool reservedBlocksValidation = reservedBlocksValidationList.All(element => element);
+            //var reservedBlocksValidationList = new List<bool>() { areaValidation, status == "RESERVED" };
+            //bool reservedBlocksValidation = reservedBlocksValidationList.All(element => element);
             bool arrivalTimeCheck = Math.Abs(offerTime - GetTimestamp()) > userDto.ArrivalTime;
 
-            if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation && arrivalTimeCheck || reservedBlocksValidation)
+            if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation && arrivalTimeCheck)
             {
                 JObject acceptHeader = new JObject(
                     new JProperty("__type", $"AcceptOfferInput:{Constants.AcceptInputUrl}"),
@@ -160,8 +160,6 @@ namespace CloudLibrary.Controllers
         {
             //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
             var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
-            var msg = $"\nUser: {userDto.UserId} >> Blocks: {response.StatusCode} >> Content: {response.Content}\n";
-            Console.WriteLine(msg);
             //SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
