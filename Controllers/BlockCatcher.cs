@@ -85,7 +85,6 @@ namespace CloudLibrary.Controllers
         public async Task AcceptSingleOfferAsync(JToken block, UserDto userDto, Dictionary<string, string> requestHeaders)
         {
             bool isValidated = false;
-            //string status = block["status"].ToString();
             long offerTime = (long)block["startTime"];
             string serviceAreaId = (string)block["serviceAreaId"];
             float offerPrice = (float)block["rateInfo"]["priceAmount"];
@@ -97,9 +96,6 @@ namespace CloudLibrary.Controllers
             Parallel.Invoke(() => scheduleValidation = ScheduleValidator.ValidateSchedule(userDto.SearchSchedule, offerTime, userDto.TimeZone),
                 () => areaValidation = userDto.Areas.Contains(serviceAreaId));
 
-            // RESERVED blocks validation
-            //var reservedBlocksValidationList = new List<bool>() { areaValidation, status == "RESERVED" };
-            //bool reservedBlocksValidation = reservedBlocksValidationList.All(element => element);
             bool arrivalTimeCheck = Math.Abs(offerTime - GetTimestamp()) > userDto.ArrivalTime;
 
             if (scheduleValidation && offerPrice >= userDto.MinimumPrice && areaValidation && arrivalTimeCheck)
@@ -147,15 +143,6 @@ namespace CloudLibrary.Controllers
             await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
         }
 
-        public void AcceptOffers(JToken offerList, UserDto userDto, Dictionary<string, string> requestHeaders)
-        {
-            Parallel.For(0, offerList.Count(), n =>
-            {
-                Thread accept = new Thread(async task => await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders));
-                accept.Start();
-            });
-        }
-
         public async Task<HttpStatusCode> GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
         {
             //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
@@ -169,8 +156,11 @@ namespace CloudLibrary.Controllers
 
                 if (offerList.HasValues)
                 {
-                    Thread acceptThread = new Thread(task => AcceptOffers(offerList, userDto, requestHeaders));
-                    acceptThread.Start();
+                    Parallel.For(0, offerList.Count(), n =>
+                    {
+                        Thread accept = new Thread(async task => await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders));
+                        accept.Start();
+                    });
                 }
 
                 // If log debug
