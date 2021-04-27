@@ -158,8 +158,8 @@ namespace CloudLibrary.Controllers
 
         public async Task<HttpStatusCode> GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
         {
-            var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
-            var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, signedHeaders);
+            //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
+            var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
             //SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
@@ -169,7 +169,7 @@ namespace CloudLibrary.Controllers
 
                 if (offerList.HasValues)
                 {
-                    Thread acceptThread = new Thread(task => AcceptOffers(offerList, userDto, signedHeaders));
+                    Thread acceptThread = new Thread(task => AcceptOffers(offerList, userDto, requestHeaders));
                     acceptThread.Start();
                 }
 
