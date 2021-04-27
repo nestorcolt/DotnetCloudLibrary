@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -17,7 +18,7 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
-        //private Stopwatch SpeedCounter;
+        private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
         {
@@ -105,7 +106,10 @@ namespace CloudLibrary.Controllers
                     new JProperty("offerId", block["offerId"].ToString())
                 );
 
+                // The logic block I want to measure ends here >>>
+                _log.LogDebug($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
                 HttpResponseMessage response = await _apiHandler.PostDataAsync(Constants.AcceptUri, acceptHeader.ToString(), requestHeaders);
+
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -128,10 +132,6 @@ namespace CloudLibrary.Controllers
                 Console.WriteLine(msg);
             }
 
-            // the code that you want to measure comes here
-            //SpeedCounter.Stop();
-            //Console.WriteLine(SpeedCounter.ElapsedMilliseconds);
-
             // send the offer seen to the offers table for further data processing or analytic
             JObject offerSeen = new JObject(
                 new JProperty(Constants.UserPk, userDto.UserId),
@@ -147,7 +147,9 @@ namespace CloudLibrary.Controllers
         {
             //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
             var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
-            //SpeedCounter = Stopwatch.StartNew();
+
+            // The logic block I want to measure starts here >>>
+            SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
             {
