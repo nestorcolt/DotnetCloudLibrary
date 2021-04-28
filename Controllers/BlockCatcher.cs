@@ -107,7 +107,7 @@ namespace CloudLibrary.Controllers
                 );
 
                 // The logic block I want to measure ends here >>>
-                Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
+                //Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
                 HttpResponseMessage response = await _apiHandler.PostDataAsync(Constants.AcceptUri, acceptHeader.ToString(), requestHeaders);
 
 
@@ -149,7 +149,7 @@ namespace CloudLibrary.Controllers
             var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
 
             // The logic block I want to measure starts here >>>
-            SpeedCounter = Stopwatch.StartNew();
+            //SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
             {
