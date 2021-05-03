@@ -149,7 +149,7 @@ namespace CloudLibrary.Controllers
             var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
 
             // The logic block I want to measure starts here >>>
-            //SpeedCounter = Stopwatch.StartNew();
+            SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
             {
@@ -161,7 +161,8 @@ namespace CloudLibrary.Controllers
                     Parallel.For(0, offerList.Count(), n =>
                     {
                         Thread accept = new Thread(async task => await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders));
-                        accept.Start();
+                        Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
+                        //accept.Start();
                     });
                 }
 
