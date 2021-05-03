@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CloudLibrary.Controllers
@@ -106,8 +105,6 @@ namespace CloudLibrary.Controllers
                     new JProperty("offerId", block["offerId"].ToString())
                 );
 
-                // The logic block I want to measure ends here >>>
-                //Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
                 HttpResponseMessage response = await _apiHandler.PostDataAsync(Constants.AcceptUri, acceptHeader.ToString(), requestHeaders);
 
 
@@ -132,6 +129,9 @@ namespace CloudLibrary.Controllers
                 Console.WriteLine(msg);
             }
 
+            // The logic block I want to measure ends here >>>
+            Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
+
             // send the offer seen to the offers table for further data processing or analytic
             JObject offerSeen = new JObject(
                 new JProperty(Constants.UserPk, userDto.UserId),
@@ -141,6 +141,7 @@ namespace CloudLibrary.Controllers
 
             // LOGS FOR SEEN OFFERS
             await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
+            SpeedCounter.Restart();
         }
 
         public async Task<HttpStatusCode> GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
@@ -156,15 +157,10 @@ namespace CloudLibrary.Controllers
                 JObject requestToken = await _apiHandler.GetRequestJTokenAsync(response);
                 JToken offerList = requestToken.GetValue("offerList");
 
-                if (offerList.HasValues)
+                for (int i = 0; i < offerList.Count(); ++i)
                 {
-                    Parallel.For(0, offerList.Count(), n =>
-                    {
-                        Thread accept = new Thread(async task => await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders));
-                        Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
-                        //accept.Start();
-                    });
-                }
+                    await AcceptSingleOfferAsync(offerList[i], userDto, requestHeaders);
+                };
 
                 // If log debug
                 _log.LogDebug(offerList.ToString());
