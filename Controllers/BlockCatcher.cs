@@ -107,7 +107,6 @@ namespace CloudLibrary.Controllers
                 );
 
                 // The logic block I want to measure ends here >>>
-                //Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
                 HttpResponseMessage response = await _apiHandler.PostDataAsync(Constants.AcceptUri, acceptHeader.ToString(), requestHeaders);
 
 
@@ -132,6 +131,8 @@ namespace CloudLibrary.Controllers
                 Console.WriteLine(msg);
             }
 
+            Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
+
             // send the offer seen to the offers table for further data processing or analytic
             JObject offerSeen = new JObject(
                 new JProperty(Constants.UserPk, userDto.UserId),
@@ -141,6 +142,7 @@ namespace CloudLibrary.Controllers
 
             // LOGS FOR SEEN OFFERS
             await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
+            SpeedCounter.Restart();
         }
 
         public async Task<HttpStatusCode> GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
@@ -162,7 +164,7 @@ namespace CloudLibrary.Controllers
                     {
                         Thread accept = new Thread(async task => await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders));
                         Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
-                        //accept.Start();
+                        accept.Start();
                     });
                 }
 
