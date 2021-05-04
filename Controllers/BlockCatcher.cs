@@ -156,6 +156,7 @@ namespace CloudLibrary.Controllers
             {
                 JObject requestToken = await _apiHandler.GetRequestJTokenAsync(response);
                 JToken offerList = requestToken.GetValue("offerList");
+                Console.WriteLine($"OffersUser: {offerList.Count()}");
 
                 for (int i = 0; i < offerList.Count(); ++i)
                 {
