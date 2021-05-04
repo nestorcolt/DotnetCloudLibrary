@@ -158,7 +158,7 @@ namespace CloudLibrary.Controllers
                 JToken offerList = requestToken.GetValue("offerList");
                 Console.WriteLine($"OffersUser: {userDto.UserId} - Count: {offerList.Count()}");
 
-                for (int i = 0; i < offerList.Count(); ++i)
+                for (int i = 0; i < offerList.Count(); i++)
                 {
                     await AcceptSingleOfferAsync(offerList[i], userDto, requestHeaders);
                 };
