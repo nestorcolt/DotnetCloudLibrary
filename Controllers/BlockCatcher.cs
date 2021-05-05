@@ -17,7 +17,7 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
-        private Stopwatch SpeedCounter;
+        //private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
         {
@@ -156,7 +156,6 @@ namespace CloudLibrary.Controllers
             {
                 JObject requestToken = await _apiHandler.GetRequestJTokenAsync(response);
                 JToken offerList = requestToken.GetValue("offerList");
-                Console.WriteLine($"OffersUser: {userDto.UserId} - Count: {offerList.Count()}");
 
                 for (int i = 0; i < offerList.Count(); i++)
                 {
