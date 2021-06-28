@@ -13,7 +13,7 @@ namespace CloudLibrary.Lib
 {
     public static class DynamoHandler
     {
-        private static readonly AmazonDynamoDBClient Client = new AmazonDynamoDBClient();
+        public static readonly AmazonDynamoDBClient Client = new AmazonDynamoDBClient();
 
         private static string _lastIteration = "last_iteration";
         private static string _accessToken = "access_token";
