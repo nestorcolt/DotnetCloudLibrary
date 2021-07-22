@@ -133,10 +133,15 @@ namespace CloudLibrary.Controllers
             //Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
 
             // send the offer seen to the offers table for further data processing or analytic
+            JObject blockData = new JObject(
+                new JProperty("offerId", block["offerId"].ToString()),
+                new JProperty("serviceAreaId", block["serviceAreaId"].ToString())
+            );
+
             JObject offerSeen = new JObject(
                 new JProperty(Constants.UserPk, userDto.UserId),
                 new JProperty("validated", isValidated),
-                new JProperty("data", block)
+                new JProperty("data", blockData)
             );
 
             // LOGS FOR SEEN OFFERS
