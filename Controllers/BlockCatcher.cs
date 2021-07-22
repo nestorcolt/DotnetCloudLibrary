@@ -87,6 +87,7 @@ namespace CloudLibrary.Controllers
             bool isValidated = false;
             long offerTime = (long)block["startTime"];
             string serviceAreaId = (string)block["serviceAreaId"];
+            string blockOfferId = block["offerId"].ToString();
             float offerPrice = (float)block["rateInfo"]["priceAmount"];
 
             // Validates the calendar schedule for this user
@@ -102,7 +103,7 @@ namespace CloudLibrary.Controllers
             {
                 JObject acceptHeader = new JObject(
                     new JProperty("__type", $"AcceptOfferInput:{Constants.AcceptInputUrl}"),
-                    new JProperty("offerId", block["offerId"].ToString())
+                    new JProperty("offerId", blockOfferId)
                 );
 
                 HttpResponseMessage response = await _apiHandler.PostDataAsync(Constants.AcceptUri, acceptHeader.ToString(), requestHeaders);
@@ -134,8 +135,8 @@ namespace CloudLibrary.Controllers
 
             // send the offer seen to the offers table for further data processing or analytic
             JObject blockData = new JObject(
-                new JProperty("offerId", block["offerId"].ToString()),
-                new JProperty("serviceAreaId", block["serviceAreaId"].ToString())
+                new JProperty("offerId", blockOfferId),
+                new JProperty("serviceAreaId", serviceAreaId)
             );
 
             JObject offerSeen = new JObject(
