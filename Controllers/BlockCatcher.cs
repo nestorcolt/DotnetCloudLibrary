@@ -17,6 +17,7 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
+        private JArray _allOffersSeen = new JArray();
         //private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
@@ -145,8 +146,8 @@ namespace CloudLibrary.Controllers
                 new JProperty("data", blockData)
             );
 
-            // LOGS FOR SEEN OFFERS
-            await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
+
+            _allOffersSeen.Add(offerSeen);
             //SpeedCounter.Restart();
         }
 
@@ -207,6 +208,9 @@ namespace CloudLibrary.Controllers
 
             if (statusCode is HttpStatusCode.OK)
             {
+                // LOGS FOR SEEN OFFERS
+                await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, _allOffersSeen.ToString());
+                _allOffersSeen.Clear();
                 return true;
             }
 
