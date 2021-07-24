@@ -17,7 +17,7 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
-        private JArray _allOffersSeen = new JArray();
+        private JObject _allOffersSeen = new JObject();
         //private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
@@ -147,7 +147,7 @@ namespace CloudLibrary.Controllers
             );
 
 
-            _allOffersSeen.Add(offerSeen);
+            _allOffersSeen.Add(blockOfferId, offerSeen);
             //SpeedCounter.Restart();
         }
 
@@ -210,7 +210,7 @@ namespace CloudLibrary.Controllers
             {
                 // LOGS FOR SEEN OFFERS
                 await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, _allOffersSeen.ToString());
-                _allOffersSeen.Clear();
+                _allOffersSeen.RemoveAll();
                 return true;
             }
 
