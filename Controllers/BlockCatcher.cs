@@ -146,32 +146,39 @@ namespace CloudLibrary.Controllers
                 new JProperty("data", blockData)
             );
 
+            if (!_allOffersSeen.ContainsKey(blockOfferId))
+            {
+                _allOffersSeen.Add(blockOfferId, offerSeen);
+            }
 
-            _allOffersSeen.Add(blockOfferId, offerSeen);
             //SpeedCounter.Restart();
         }
 
-        public async Task<HttpStatusCode> GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
+        public HttpStatusCode GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
         {
             //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
-            var response = await _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders);
+            var response = _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders).Result;
 
             // The logic block I want to measure starts here >>>
             //SpeedCounter = Stopwatch.StartNew();
 
             if (response.IsSuccessStatusCode)
             {
-                JObject requestToken = await _apiHandler.GetRequestJTokenAsync(response);
+                JObject requestToken = _apiHandler.GetRequestJTokenAsync(response).Result;
                 JToken offerList = requestToken.GetValue("offerList");
 
-                for (int i = 0; i < offerList.Count(); i++)
+                Parallel.For(0, offerList.Count(), async n =>
                 {
-                    await AcceptSingleOfferAsync(offerList[i], userDto, requestHeaders);
-                };
+                    await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders);
+                });
 
                 // If log debug
-                _log.LogDebug(offerList.ToString());
+                //_log.LogDebug(offerList.ToString());
             }
+
+            // LOGS FOR SEEN OFFERS
+            SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, _allOffersSeen.ToString()).Wait();
+            _allOffersSeen.RemoveAll();
 
             return response.StatusCode;
         }
@@ -204,13 +211,10 @@ namespace CloudLibrary.Controllers
             }
 
             // start logic here main request
-            HttpStatusCode statusCode = await GetOffersAsyncHandle(userDto, userDto.ServiceAreaHeader, requestHeaders);
+            HttpStatusCode statusCode = GetOffersAsyncHandle(userDto, userDto.ServiceAreaHeader, requestHeaders);
 
             if (statusCode is HttpStatusCode.OK)
             {
-                // LOGS FOR SEEN OFFERS
-                await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, _allOffersSeen.ToString());
-                _allOffersSeen.RemoveAll();
                 return true;
             }
 
