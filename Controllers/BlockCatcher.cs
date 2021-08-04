@@ -170,10 +170,15 @@ namespace CloudLibrary.Controllers
                 Parallel.For(0, offerList.Count(), async n =>
                 {
                     JObject offerValidated = await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders);
-                    string parsedKey = userDto.UserId + GetTimestamp().ToString() +
-                                       (new Random().Next(0, 100).ToString());
 
-                    allOffersSeen.Add(parsedKey, offerValidated);
+                    string parsedKey = userDto.UserId + GetTimestamp().ToString() +
+                                       (new Random().Next(int.Parse(userDto.UserId), GetTimestamp()).ToString());
+
+                    if (!allOffersSeen.ContainsKey(parsedKey))
+                    {
+                        allOffersSeen.Add(parsedKey, offerValidated);
+                    }
+
                 });
 
                 var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
