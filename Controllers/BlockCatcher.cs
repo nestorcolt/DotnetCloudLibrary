@@ -146,10 +146,9 @@ namespace CloudLibrary.Controllers
                 new JProperty("data", blockData)
             );
 
-            if (!_allOffersSeen.ContainsKey(blockOfferId))
-            {
-                _allOffersSeen.Add(blockOfferId, offerSeen);
-            }
+            await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
+            var howManyBytes = offerSeen.ToString().Length * sizeof(Char);
+            Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} - {offerSeen}");
 
             //SpeedCounter.Restart();
         }
@@ -175,12 +174,6 @@ namespace CloudLibrary.Controllers
                 // If log debug
                 //_log.LogDebug(offerList.ToString());
             }
-
-            // LOGS FOR SEEN OFFERS
-            var howManyBytes = _allOffersSeen.ToString().Length * sizeof(Char);
-            Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} - {_allOffersSeen.ToString()}");
-            SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, _allOffersSeen.ToString()).Wait();
-            _allOffersSeen = new JObject();
 
             return response.StatusCode;
         }
