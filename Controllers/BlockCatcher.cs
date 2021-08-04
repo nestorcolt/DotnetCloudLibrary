@@ -164,6 +164,11 @@ namespace CloudLibrary.Controllers
                 JObject requestToken = _apiHandler.GetRequestJTokenAsync(response).Result;
                 JToken offerList = requestToken.GetValue("offerList");
 
+                if (offerList == null)
+                {
+                    return response.StatusCode;
+                }
+
                 foreach (var offer in offerList)
                 {
                     JToken offerValidated = AcceptSingleOfferAsync(offer, userDto, requestHeaders).Result;
@@ -185,7 +190,9 @@ namespace CloudLibrary.Controllers
                     {
                         try
                         {
-                            SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()).Wait();
+                            Task.Run((() =>
+                                SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()))
+                                );
                         }
                         catch (Exception)
                         {
