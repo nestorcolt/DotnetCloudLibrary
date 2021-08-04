@@ -17,7 +17,6 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
-        private JObject _allOffersSeen = new JObject();
         //private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
@@ -83,7 +82,7 @@ namespace CloudLibrary.Controllers
             return requestDictionary;
         }
 
-        public async Task AcceptSingleOfferAsync(JToken block, UserDto userDto, Dictionary<string, string> requestHeaders)
+        public async Task<JObject> AcceptSingleOfferAsync(JToken block, UserDto userDto, Dictionary<string, string> requestHeaders)
         {
             bool isValidated = false;
             long offerTime = (long)block["startTime"];
@@ -146,17 +145,19 @@ namespace CloudLibrary.Controllers
                 new JProperty("data", blockData)
             );
 
-            await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
-            var howManyBytes = offerSeen.ToString().Length * sizeof(Char);
-            Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} - {offerSeen}");
+            //await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
+            //var howManyBytes = offerSeen.ToString().Length * sizeof(Char);
+            //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} - {offerSeen}");
 
             //SpeedCounter.Restart();
+            return offerSeen;
         }
 
         public HttpStatusCode GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
         {
             //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
             var response = _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders).Result;
+            JObject allOffersSeen = new JObject();
 
             // The logic block I want to measure starts here >>>
             //SpeedCounter = Stopwatch.StartNew();
@@ -168,8 +169,13 @@ namespace CloudLibrary.Controllers
 
                 Parallel.For(0, offerList.Count(), async n =>
                 {
-                    await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders);
+                    JObject offerValidated = await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders);
+                    allOffersSeen.Add(offerValidated["data"]["offerId"], offerValidated);
                 });
+
+                var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
+                Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes});
+                await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString());
 
                 // If log debug
                 //_log.LogDebug(offerList.ToString());
