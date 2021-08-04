@@ -164,9 +164,9 @@ namespace CloudLibrary.Controllers
                 JObject requestToken = _apiHandler.GetRequestJTokenAsync(response).Result;
                 JToken offerList = requestToken.GetValue("offerList");
 
-                Parallel.For(0, offerList.Count(), async n =>
+                foreach (var offer in offerList)
                 {
-                    JObject offerValidated = await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders);
+                    JToken offerValidated = AcceptSingleOfferAsync(offer, userDto, requestHeaders).Result;
 
                     string parsedKey = userDto.UserId + GetTimestamp().ToString() +
                                        (new Random().Next(int.Parse(userDto.UserId), GetTimestamp()).ToString());
@@ -175,13 +175,12 @@ namespace CloudLibrary.Controllers
                     {
                         allOffersSeen.Add(parsedKey, offerValidated);
                     }
-
-                });
+                }
 
                 if (allOffersSeen.HasValues)
                 {
-                    var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
-                    //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} seen {allOffersSeen}");
+                    int howManyBytes = allOffersSeen.ToString().Length * sizeof(char);
+                    //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes});
 
                     if (howManyBytes > 4)
                     {
@@ -189,16 +188,12 @@ namespace CloudLibrary.Controllers
                         {
                             SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()).Wait();
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
-                            Console.WriteLine($"The size of the message was superior to 256 kb: {allOffersSeen.ToString().Length * sizeof(Char)}");
+                            Console.WriteLine($"The size of the message was superior to 256 kb: {howManyBytes}");
                         }
                     }
-
                 }
-
-                // If log debug
-                //_log.LogDebug(offerList.ToString());
             }
 
             return response.StatusCode;
