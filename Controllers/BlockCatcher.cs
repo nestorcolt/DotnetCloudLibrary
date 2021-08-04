@@ -178,7 +178,7 @@ namespace CloudLibrary.Controllers
 
             // LOGS FOR SEEN OFFERS
             SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, _allOffersSeen.ToString()).Wait();
-            _allOffersSeen.RemoveAll();
+            //_allOffersSeen.RemoveAll();
 
             return response.StatusCode;
         }
