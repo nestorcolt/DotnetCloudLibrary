@@ -178,7 +178,7 @@ namespace CloudLibrary.Controllers
 
             // LOGS FOR SEEN OFFERS
             var howManyBytes = _allOffersSeen.ToString().Length * sizeof(Char);
-            Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes}");
+            Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} - {_allOffersSeen.ToString()}");
             SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, _allOffersSeen.ToString()).Wait();
             _allOffersSeen = new JObject();
 
