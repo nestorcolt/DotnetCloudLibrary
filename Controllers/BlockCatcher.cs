@@ -170,7 +170,10 @@ namespace CloudLibrary.Controllers
                 Parallel.For(0, offerList.Count(), async n =>
                 {
                     JObject offerValidated = await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders);
-                    allOffersSeen.Add(offerValidated["data"]["offerId"].ToString(), offerValidated);
+                    string parsedKey = userDto.UserId + GetTimestamp().ToString() +
+                                       (new Random().Next(0, 100).ToString());
+
+                    allOffersSeen.Add(parsedKey, offerValidated);
                 });
 
                 var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
