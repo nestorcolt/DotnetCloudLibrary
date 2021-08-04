@@ -178,16 +178,23 @@ namespace CloudLibrary.Controllers
 
                 });
 
-                //var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
-                //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} seen {allOffersSeen}");
+                if (allOffersSeen.HasValues)
+                {
+                    var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
+                    //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} seen {allOffersSeen}");
 
-                try
-                {
-                    SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()).Wait();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"The size of the message was superior to 256 kb: {allOffersSeen.ToString().Length * sizeof(Char)}");
+                    if (howManyBytes > 4)
+                    {
+                        try
+                        {
+                            SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()).Wait();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"The size of the message was superior to 256 kb: {allOffersSeen.ToString().Length * sizeof(Char)}");
+                        }
+                    }
+
                 }
 
                 // If log debug
