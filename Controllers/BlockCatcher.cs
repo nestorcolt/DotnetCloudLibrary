@@ -170,12 +170,12 @@ namespace CloudLibrary.Controllers
                 Parallel.For(0, offerList.Count(), async n =>
                 {
                     JObject offerValidated = await AcceptSingleOfferAsync(offerList[n], userDto, requestHeaders);
-                    allOffersSeen.Add(offerValidated["data"]["offerId"], offerValidated);
+                    allOffersSeen.Add(offerValidated["data"]["offerId"].ToString(), offerValidated);
                 });
 
                 var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
-                Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes});
-                await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString());
+                Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} seen {allOffersSeen}");
+                SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()).Wait();
 
                 // If log debug
                 //_log.LogDebug(offerList.ToString());
