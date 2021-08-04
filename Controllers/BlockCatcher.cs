@@ -180,7 +180,6 @@ namespace CloudLibrary.Controllers
                 if (allOffersSeen.HasValues)
                 {
                     int howManyBytes = allOffersSeen.ToString().Length * sizeof(char);
-                    //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes});
 
                     if (howManyBytes > 4)
                     {
@@ -193,6 +192,7 @@ namespace CloudLibrary.Controllers
                             Console.WriteLine($"The size of the message was superior to 256 kb: {howManyBytes}");
                         }
                     }
+
                 }
             }
 
