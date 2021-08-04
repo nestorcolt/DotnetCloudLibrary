@@ -145,11 +145,8 @@ namespace CloudLibrary.Controllers
                 new JProperty("data", blockData)
             );
 
-            //await SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, offerSeen.ToString());
-            //var howManyBytes = offerSeen.ToString().Length * sizeof(Char);
-            //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} - {offerSeen}");
-
             //SpeedCounter.Restart();
+
             return offerSeen;
         }
 
@@ -181,9 +178,17 @@ namespace CloudLibrary.Controllers
 
                 });
 
-                var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
-                Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} seen {allOffersSeen}");
-                SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()).Wait();
+                //var howManyBytes = allOffersSeen.ToString().Length * sizeof(Char);
+                //Console.WriteLine($"USERID {userDto.UserId} sizeOf {howManyBytes} seen {allOffersSeen}");
+
+                try
+                {
+                    SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()).Wait();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"The size of the message was superior to 256 kb: {allOffersSeen.ToString().Length * sizeof(Char)}");
+                }
 
                 // If log debug
                 //_log.LogDebug(offerList.ToString());
