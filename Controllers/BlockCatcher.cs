@@ -17,7 +17,6 @@ namespace CloudLibrary.Controllers
     {
         private readonly ILogger<BlockCatcher> _log;
         private readonly IApiHandler _apiHandler;
-        //private Stopwatch SpeedCounter;
 
         public BlockCatcher(ILogger<BlockCatcher> log, IApiHandler apiHandler)
         {
@@ -130,9 +129,6 @@ namespace CloudLibrary.Controllers
                 Console.WriteLine(msg);
             }
 
-            // The logic block I want to measure ends here >>>
-            //Console.WriteLine($"code speed: {SpeedCounter.ElapsedMilliseconds} milliseconds");
-
             // send the offer seen to the offers table for further data processing or analytic
             JObject blockData = new JObject(
                 new JProperty("offerId", blockOfferId),
@@ -145,8 +141,6 @@ namespace CloudLibrary.Controllers
                 new JProperty("data", blockData)
             );
 
-            //SpeedCounter.Restart();
-
             return offerSeen;
         }
 
@@ -156,18 +150,11 @@ namespace CloudLibrary.Controllers
             var response = _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders).Result;
             JObject allOffersSeen = new JObject();
 
-            // The logic block I want to measure starts here >>>
-            //SpeedCounter = Stopwatch.StartNew();
-
             if (response.IsSuccessStatusCode)
             {
                 JObject requestToken = _apiHandler.GetRequestJTokenAsync(response).Result;
                 JToken offerList = requestToken.GetValue("offerList");
-
-                if (offerList == null)
-                {
-                    return response.StatusCode;
-                }
+                if (offerList == null) { return response.StatusCode; }
 
                 foreach (var offer in offerList)
                 {
@@ -182,28 +169,44 @@ namespace CloudLibrary.Controllers
                     }
                 }
 
+                // process all the messages sending in chunk all those grater than the SQS limit size
                 if (allOffersSeen.HasValues)
                 {
-                    int howManyBytes = allOffersSeen.ToString().Length * sizeof(char);
-
-                    if (howManyBytes > 4)
-                    {
-                        try
-                        {
-                            Task.Run((() =>
-                                SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, allOffersSeen.ToString()))
-                                );
-                        }
-                        catch (Exception)
-                        {
-                            Console.WriteLine($"The size of the message was superior to 256 kb: {howManyBytes}");
-                        }
-                    }
-
+                    ProcessOffersSqsMessage(allOffersSeen);
                 }
             }
 
             return response.StatusCode;
+        }
+
+        private void ProcessOffersSqsMessage(JObject message)
+        {
+            int msgSizeBytes = message.ToString().Length * sizeof(char);
+            if (msgSizeBytes <= 4) { return; }
+
+            JObject msgQueue = new JObject();
+            long awsSqsMsgLimitSize = 262144;
+
+            while (msgSizeBytes > awsSqsMsgLimitSize)
+            {
+                JToken popToken = message.Last;
+                msgQueue.Add(popToken);
+                popToken.Remove();
+
+                msgSizeBytes = message.ToString().Length * sizeof(char);
+            }
+
+            try
+            {
+                Task.Run((() => SqsHandler.SendMessage(Constants.UpdateOffersTableQueue, message.ToString())));
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"An error occurred while sending the offers to the SQS.");
+            }
+
+            // Send to re-process the rest of the messages
+            ProcessOffersSqsMessage(msgQueue);
         }
 
         public async Task<bool> LookingForBlocks(UserDto userDto)
