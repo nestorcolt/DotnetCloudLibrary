@@ -146,8 +146,8 @@ namespace CloudLibrary.Controllers
 
         public HttpStatusCode GetOffersAsyncHandle(UserDto userDto, string serviceAreaId, Dictionary<string, string> requestHeaders)
         {
-            //var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
-            var response = _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, requestHeaders).Result;
+            var signedHeaders = SignRequestHeaders($"{Constants.ApiBaseUrl}{Constants.OffersUri}", userDto.AccessToken, requestHeaders);
+            var response = _apiHandler.PostDataAsync(Constants.OffersUri, serviceAreaId, signedHeaders).Result;
             JObject allOffersSeen = new JObject();
 
             if (response.IsSuccessStatusCode)
@@ -158,7 +158,7 @@ namespace CloudLibrary.Controllers
 
                 foreach (var offer in offerList)
                 {
-                    JToken offerValidated = AcceptSingleOfferAsync(offer, userDto, requestHeaders).Result;
+                    JToken offerValidated = AcceptSingleOfferAsync(offer, userDto, signedHeaders).Result;
 
                     string parsedKey = userDto.UserId + GetTimestamp().ToString() +
                                        (new Random().Next(int.Parse(userDto.UserId), GetTimestamp()).ToString());
