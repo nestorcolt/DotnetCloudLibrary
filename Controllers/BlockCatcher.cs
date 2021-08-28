@@ -215,7 +215,7 @@ namespace CloudLibrary.Controllers
             if (!ScheduleHasData(userDto.SearchSchedule))
             {
                 await DeactivateUser(userDto.UserId);
-                _log.LogWarning("User Is being Deactivated");
+                _log.LogWarning("No schedule found. Search disabled");
                 return false;
             }
 
@@ -231,7 +231,7 @@ namespace CloudLibrary.Controllers
             // validation before continue
             if (String.IsNullOrEmpty(userDto.ServiceAreaHeader))
             {
-                await CloudLogger.Log("Service area ID was empty or null. Re-trying authentication...", userDto.UserId);
+                await CloudLogger.Log("Service area ID empty, re-authenticating", userDto.UserId);
                 await Authenticator.RequestNewAccessToken(userDto);
                 return false;
             }
@@ -257,7 +257,7 @@ namespace CloudLibrary.Controllers
                 await SnsHandler.PublishToSnsAsync(new JObject(new JProperty(Constants.UserPk, userDto.UserId)).ToString(), "msg", Constants.SleepSnsTopic);
 
                 // Stream Logs
-                string responseStatus = $"\nRequest Status >> Reason >> {statusCode} | The system will pause for 30 minutes\n";
+                string responseStatus = $"\nStatus: {statusCode} | System Paused\n";
                 await CloudLogger.Log(responseStatus, userDto.UserId);
                 _log.LogWarning(responseStatus);
             }
