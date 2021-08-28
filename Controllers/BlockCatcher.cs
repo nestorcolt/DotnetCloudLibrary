@@ -247,8 +247,10 @@ namespace CloudLibrary.Controllers
             if (statusCode is HttpStatusCode.Unauthorized || statusCode is HttpStatusCode.Forbidden)
             {
                 // Re-authenticate after the access token has expired
+                string responseStatus = "Requesting New Access Token";
                 await Authenticator.RequestNewAccessToken(userDto);
-                _log.LogWarning("Requesting New Access Token");
+                await CloudLogger.Log(responseStatus, userDto.UserId);
+                _log.LogWarning(responseStatus);
             }
 
             else if (statusCode is HttpStatusCode.BadRequest || statusCode is HttpStatusCode.TooManyRequests)
